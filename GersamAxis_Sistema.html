@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gersam Axis – Sistema Integral de Salud</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- SIDEBAR -->
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">
+      <!-- Gersam Axis logo SVG (medical cross + orbit) -->
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <defs>
+          <linearGradient id="crossG" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#00b4d8"/>
+            <stop offset="50%" stop-color="#3b82f6"/>
+            <stop offset="100%" stop-color="#7c3aed"/>
+          </linearGradient>
+          <linearGradient id="swooshG" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#10b981"/>
+            <stop offset="100%" stop-color="#00b4d8"/>
+          </linearGradient>
+        </defs>
+        <!-- Medical cross -->
+        <rect x="12" y="4" width="12" height="28" rx="3" fill="url(#crossG)"/>
+        <rect x="4" y="12" width="28" height="12" rx="3" fill="url(#crossG)"/>
+        <!-- White + -->
+        <rect x="15.5" y="8" width="5" height="20" rx="1" fill="white" opacity=".9"/>
+        <rect x="8" y="15.5" width="20" height="5" rx="1" fill="white" opacity=".9"/>
+        <!-- Orbit swoosh -->
+        <ellipse cx="18" cy="18" rx="15" ry="6" stroke="url(#swooshG)" stroke-width="1.5" fill="none" transform="rotate(-20 18 18)"/>
+        <circle cx="30" cy="11" r="2" fill="#23e5c0"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-name">Gersam Axis</div>
+      <div class="logo-sub">Sistema Médico IPS</div>
+    </div>
+  </div>
+  <div class="sidebar-toggle" onclick="toggleSidebar()">◀</div>
+
+  <div style="overflow-y:auto;flex:1;padding-bottom:16px">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" onclick="goTo('dashboard',this)"><span class="nav-icon">📊</span><span class="nav-label">Panel de Control</span></div>
+    <div class="nav-item" onclick="goTo('agenda',this)"><span class="nav-icon">📅</span><span class="nav-label">Agendamiento</span><span class="nav-badge">4</span></div>
+
+    <div class="nav-section">Pacientes</div>
+    <div class="nav-item" onclick="goTo('registro',this)"><span class="nav-icon">👤</span><span class="nav-label">Registro Paciente</span></div>
+    <div class="nav-item" onclick="goTo('hc',this)"><span class="nav-icon">📋</span><span class="nav-label">Historia Clínica</span></div>
+    <div class="nav-item" onclick="goTo('rda',this)"><span class="nav-icon">🔬</span><span class="nav-label">RDA Optometría</span></div>
+
+    <div class="nav-section">Facturación</div>
+    <div class="nav-item" onclick="goTo('rips',this)"><span class="nav-icon">🗂️</span><span class="nav-label">RIPS / FEV-RIPS</span></div>
+    <div class="nav-item" onclick="goTo('dian',this)"><span class="nav-icon">🏛️</span><span class="nav-label">Factura DIAN</span></div>
+
+    <div class="nav-section">Operaciones</div>
+    <div class="nav-item" onclick="goTo('inventario',this)"><span class="nav-icon">📦</span><span class="nav-label">Inventario</span></div>
+    <div class="nav-item" onclick="goTo('notificaciones',this)"><span class="nav-icon">💬</span><span class="nav-label">WhatsApp Notif.</span><span class="nav-badge">3</span></div>
+
+    <div class="nav-section">Sistema</div>
+    <div class="nav-item" onclick="goTo('reportes',this)"><span class="nav-icon">📈</span><span class="nav-label">Reportes</span></div>
+    <div class="nav-item" onclick="goTo('config',this)"><span class="nav-icon">⚙️</span><span class="nav-label">Configuración</span></div>
+  </div>
+  <div style="padding:10px 14px;border-top:1px solid var(--border)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="av av1" style="width:28px;height:28px;font-size:.65rem">AS</div>
+      <div class="logo-text"><div style="font-size:.78rem;font-weight:600;color:var(--text)">Opt. Andrea Salcedo</div><div style="font-size:.65rem;color:var(--text3)">Optometría</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN WRAPPER -->
+<div class="main-wrap" id="mainWrap">
+  <!-- TOPBAR -->
+  <div class="topbar" id="topbar">
+    <div class="tb-title" id="tb-title">Panel de Control</div>
+    <div class="tb-spacer"></div>
+    <div class="tb-search">
+      <span style="color:var(--text3);font-size:.85rem">🔍</span>
+      <input placeholder="Buscar paciente, ID, diagnóstico…" oninput="globalSearch(this.value)">
+    </div>
+    <button class="tb-btn green" onclick="showVoice()">🎙️ Voz</button>
+    <button class="tb-btn wa" onclick="goTo('notificaciones',null)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      WhatsApp
+    </button>
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="status-dot"></div>
+      <span style="font-size:.72rem;color:var(--green);font-weight:600">DIAN Online</span>
+    </div>
+    <button class="tb-btn primary" onclick="goTo('registro',null)">+ Nuevo Paciente</button>
+  </div>
+
+  <div class="main">
+
+  <!-- ═══════════════════════ DASHBOARD ═══════════════════════ -->
+  <div class="section active" id="sec-dashboard">
+    <div class="metrics-row">
+      <div class="metric"><div class="metric-label">Atenciones Hoy</div><div class="metric-val">14</div><div class="metric-sub">↑ 4 vs ayer</div></div>
+      <div class="metric"><div class="metric-label">Completadas</div><div class="metric-val green">9</div><div class="metric-sub">64% del turno</div></div>
+      <div class="metric"><div class="metric-label">Fact. Electrón.</div><div class="metric-val teal">$2.4M</div><div class="metric-sub">7 facturas DIAN</div></div>
+      <div class="metric"><div class="metric-label">RIPS Pendientes</div><div class="metric-val amber">3</div><div class="metric-sub">Generar y enviar</div></div>
+      <div class="metric"><div class="metric-label">Stock Crítico</div><div class="metric-val red">5</div><div class="metric-sub">Ítems bajo mínimo</div></div>
+    </div>
+
+    <div class="grid-main">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🗓️ Atenciones del Día</div>
+          <div style="display:flex;gap:6px">
+            <button class="btn" onclick="goTo('rda',null)" style="padding:5px 10px;font-size:.72rem">+ RDA</button>
+            <button class="btn primary" onclick="goTo('hc',null)" style="padding:5px 10px;font-size:.72rem">Historia Clínica</button>
+          </div>
+        </div>
+        <table class="tbl" id="dash-tbl">
+          <thead><tr><th>Paciente</th><th>Hora</th><th>Diagnóstico</th><th>Profesional</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="dash-tbody"></tbody>
+        </table>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="card">
+          <div class="card-head"><div class="card-title">📡 Estado Integraciones</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:.8rem;color:var(--text2)">🏛️ DIAN – Factura Electrónica</span>
+              <span class="pill pill-done">● Conectado</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:.8rem;color:var(--text2)">📅 Google Calendar</span>
+              <span class="pill pill-done">● Sincronizado</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:.8rem;color:var(--text2)">💬 WhatsApp Business</span>
+              <span class="pill pill-done">● Activo</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:.8rem;color:var(--text2)">🗂️ RIPS – MINSALUD</span>
+              <span class="pill pill-pend">● Pendiente sync</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <span style="font-size:.8rem;color:var(--text2)">🎙️ Reconocimiento de Voz</span>
+              <span class="pill pill-prog">● Disponible</span>
+            </div>
+            <div class="glow-line"></div>
+            <button class="btn success" style="width:100%;justify-content:center" onclick="showToast('RIPS sincronizados con MINSALUD exitosamente','success')">Sincronizar RIPS Ahora</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">📊 Resumen Inventario</div></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:8px">
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text2);margin-bottom:3px"><span>Lentes monofocales</span><span style="color:var(--green)">142 uds</span></div>
+              <div class="inv-bar"><div class="inv-fill" style="width:71%;background:var(--green)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text2);margin-bottom:3px"><span>Gotas lubricantes</span><span style="color:var(--amber)">18 uds</span></div>
+              <div class="inv-bar"><div class="inv-fill" style="width:18%;background:var(--amber)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text2);margin-bottom:3px"><span>Tropicamida 1%</span><span style="color:var(--red)">4 uds</span></div>
+              <div class="inv-bar"><div class="inv-fill" style="width:8%;background:var(--red)"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:.75rem;color:var(--text2);margin-bottom:3px"><span>Lentes progresivos</span><span style="color:var(--accent1)">67 uds</span></div>
+              <div class="inv-bar"><div class="inv-fill" style="width:45%;background:var(--accent1)"></div></div>
+            </div>
+            <button class="btn" style="width:100%;justify-content:center;margin-top:4px;font-size:.75rem" onclick="goTo('inventario',null)">Ver inventario completo →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ AGENDAMIENTO ═══════════════════════ -->
+  <div class="section" id="sec-agenda">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📅 Calendario Google – Disponibilidad</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn" id="cal-prev" onclick="calNav(-1)" style="padding:4px 8px">◀</button>
+            <span style="font-size:.82rem;color:var(--text2)" id="cal-month-label"></span>
+            <button class="btn" id="cal-next" onclick="calNav(1)" style="padding:4px 8px">▶</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="cal-header">
+            <div class="cal-day-head">Dom</div><div class="cal-day-head">Lun</div><div class="cal-day-head">Mar</div>
+            <div class="cal-day-head">Mié</div><div class="cal-day-head">Jue</div><div class="cal-day-head">Vie</div><div class="cal-day-head">Sáb</div>
+          </div>
+          <div class="cal-grid" id="cal-grid"></div>
+          <div style="display:flex;gap:12px;margin-top:8px;font-size:.68rem;color:var(--text3)">
+            <span><span style="color:var(--accent3)">■</span> Disponible</span>
+            <span><span style="color:var(--red)">■</span> Ocupado</span>
+            <span><span style="color:var(--accent1)">■</span> Hoy</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">⏰ Horarios Disponibles – <span id="selected-date-label" style="color:var(--accent3);font-size:.82rem">Seleccione un día</span></div></div>
+        <div class="card-body">
+          <div class="slots-grid" id="slots-grid">
+            <div style="grid-column:1/-1;text-align:center;color:var(--text3);font-size:.8rem;padding:20px 0">Seleccione un día disponible para ver horarios</div>
+          </div>
+          <div id="agenda-form" style="display:none;margin-top:14px">
+            <div class="glow-line"></div>
+            <div style="font-size:.75rem;color:var(--accent3);margin:8px 0;font-weight:600">DATOS DEL PACIENTE</div>
+            <div class="form-grid g2" style="gap:8px">
+              <div class="field"><label>Nombre Paciente</label><input type="text" placeholder="Buscar o nuevo…" id="ag-nombre"></div>
+              <div class="field"><label>Teléfono / WA</label><input type="tel" placeholder="+57 300…" id="ag-tel"></div>
+              <div class="field"><label>Tipo Consulta</label>
+                <select id="ag-tipo"><option>Primera vez</option><option>Control</option><option>Urgencia</option></select>
+              </div>
+              <div class="field"><label>Profesional</label>
+                <select><option>Opt. Andrea Salcedo</option><option>Dr. Héctor Monsalve</option></select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <button class="btn primary" onclick="confirmarCita()">✓ Confirmar Cita</button>
+              <button class="btn wa" onclick="notifWA()">📲 Notificar por WA</button>
+              <button class="btn" onclick="exportCal()">📅 Agregar a Google Calendar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">📋 Citas del Día</div></div>
+      <table class="tbl">
+        <thead><tr><th>Hora</th><th>Paciente</th><th>Tipo</th><th>Profesional</th><th>Estado</th><th>WA</th></tr></thead>
+        <tbody id="citas-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ REGISTRO PACIENTE ═══════════════════════ -->
+  <div class="section" id="sec-registro">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">👤 Registro de Paciente – Proceso CIE-10</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="voice-btn" id="voiceRegBtn" onclick="toggleVoice('registro')" title="Dictar por voz">🎙️</div>
+          <button class="btn primary" onclick="guardarPaciente()">💾 Guardar Paciente</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:16px;padding:14px 16px;border-bottom:1px solid var(--border)">
+        <!-- PHOTO UPLOAD -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px">
+          <div class="photo-zone" id="photoZone" onclick="document.getElementById('photoInput').click()">
+            <div id="photoPlaceholder">📷<div style="font-size:.6rem;margin-top:4px">Foto</div></div>
+          </div>
+          <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="previewPhoto(this)">
+          <div style="font-size:.6rem;color:var(--text3)">Click para subir</div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:10px;font-weight:700">DATOS DE IDENTIFICACIÓN</div>
+          <div class="form-grid g3" style="gap:10px">
+            <div class="field"><label>Tipo Documento</label>
+              <select id="reg-tipodoc"><option>CC – Cédula</option><option>TI – Tarjeta Identidad</option><option>CE – Cédula Extranjería</option><option>PA – Pasaporte</option><option>RC – Reg. Civil</option><option>NUI</option></select>
+            </div>
+            <div class="field"><label>N° Documento</label><input type="text" id="reg-doc" placeholder=""></div>
+            <div class="field"><label>Fecha Expedición</label><input type="date" id="reg-docfecha"></div>
+            <div class="field span2"><label>Primer y Segundo Nombre</label><input type="text" id="reg-nombres" placeholder=""></div>
+            <div class="field span2"><label>Primer y Segundo Apellido</label><input type="text" id="reg-apellidos" placeholder=""></div>
+            <div class="field"><label>Fecha Nacimiento</label><input type="date" id="reg-fnac" onchange="calcEdad()"></div>
+            <div class="field"><label>Edad</label><input type="text" id="reg-edad" placeholder="Auto" readonly style="color:var(--accent3)"></div>
+            <div class="field"><label>Sexo</label><select id="reg-sexo"><option>Femenino</option><option>Masculino</option><option>No binario</option></select></div>
+            <div class="field"><label>Grupo Sanguíneo</label>
+              <select><option>O+</option><option>O-</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option></select>
+            </div>
+            <div class="field"><label>Etnia</label>
+              <select><option>Ninguna</option><option>Indígena</option><option>Afrocolombiano</option><option>Raizal</option><option>Palenquero</option><option>ROM/Gitano</option></select>
+            </div>
+            <div class="field"><label>Estado Civil</label>
+              <select><option>Soltero/a</option><option>Casado/a</option><option>Unión libre</option><option>Divorciado/a</option><option>Viudo/a</option></select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:10px;font-weight:700">CONTACTO Y UBICACIÓN</div>
+        <div class="form-grid g3">
+          <div class="field"><label>Celular / WhatsApp</label><input type="tel" id="reg-cel" placeholder="+57 300 000 0000"></div>
+          <div class="field"><label>Teléfono Fijo</label><input type="tel" placeholder=""></div>
+          <div class="field"><label>Correo Electrónico</label><input type="email" placeholder=""></div>
+          <div class="field"><label>Departamento</label>
+            <select><option>Antioquia</option><option>Bogotá D.C.</option><option>Valle del Cauca</option><option>Cundinamarca</option><option>Otro</option></select>
+          </div>
+          <div class="field"><label>Municipio</label><input type="text" placeholder="Medellín"></div>
+          <div class="field"><label>Barrio</label><input type="text" placeholder=""></div>
+          <div class="field span3"><label>Dirección</label><input type="text" placeholder="Calle, Carrera, N°, Apto…"></div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
+        <div style="font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:10px;font-weight:700">ASEGURAMIENTO – SGSSS</div>
+        <div class="form-grid g3">
+          <div class="field"><label>Tipo de Afiliación</label>
+            <select id="reg-regimen"><option>Contributivo</option><option>Subsidiado</option><option>Particular</option><option>ARL</option><option>SOAT</option><option>Medicina Prepagada</option><option>Sin afiliación</option></select>
+          </div>
+          <div class="field"><label>EPS / Aseguradora</label>
+            <select><option>Sura EPS</option><option>Nueva EPS</option><option>Compensar</option><option>Sanitas</option><option>Coomeva</option><option>Salud Total</option><option>Medimás</option><option>Particular</option></select>
+          </div>
+          <div class="field"><label>N° Póliza / Carné</label><input type="text" placeholder=""></div>
+          <div class="field"><label>Nivel SISBEN</label>
+            <select><option>No aplica</option><option>A</option><option>B</option><option>C</option><option>D</option></select>
+          </div>
+          <div class="field"><label>Ocupación</label><input type="text" placeholder=""></div>
+          <div class="field"><label>Empresa Empleadora</label><input type="text" placeholder=""></div>
+        </div>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent3);margin-bottom:10px;font-weight:700">CONTACTO DE EMERGENCIA</div>
+        <div class="form-grid g3">
+          <div class="field span2"><label>Nombre Contacto</label><input type="text" placeholder=""></div>
+          <div class="field"><label>Parentesco</label><input type="text" placeholder=""></div>
+          <div class="field"><label>Teléfono Emergencia</label><input type="tel" placeholder=""></div>
+          <div class="field span2"><label>Observaciones Generales</label><input type="text" placeholder=""></div>
+        </div>
+        <div style="font-size:.65rem;color:var(--text3);margin-top:10px;display:flex;align-items:center;gap:6px">🔊 <span id="voice-reg-status">Haga clic en 🎙️ para dictar datos por voz</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ HISTORIA CLÍNICA ═══════════════════════ -->
+  <div class="section" id="sec-hc">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">📋 Historia Clínica – CIE-10 con Ayudas Diagnósticas</div>
+        <div style="display:flex;gap:8px">
+          <div class="voice-btn" id="voiceHCBtn" onclick="toggleVoice('hc')" title="Dictar historia por voz">🎙️</div>
+          <button class="btn success" onclick="showToast('Historia clínica guardada exitosamente','success')">💾 Guardar HC</button>
+          <button class="btn" onclick="showToast('HC exportada a PDF','success')">📄 PDF</button>
+        </div>
+      </div>
+      <div class="tab-row">
+        <div class="tab active" onclick="switchTab(this,'hc-anamnesis')">Anamnesis</div>
+        <div class="tab" onclick="switchTab(this,'hc-examen')">Examen Optométrico</div>
+        <div class="tab" onclick="switchTab(this,'hc-oftalmo')">Examen Oftalmológico</div>
+        <div class="tab" onclick="switchTab(this,'hc-ayudas')">Ayudas Diagnósticas</div>
+        <div class="tab" onclick="switchTab(this,'hc-dx')">Diagnóstico CIE-10</div>
+        <div class="tab" onclick="switchTab(this,'hc-plan')">Plan y Tratamiento</div>
+      </div>
+
+      <!-- HC PACIENTE HEADER -->
+      <div style="padding:10px 16px;background:rgba(0,180,216,.04);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px">
+        <div id="hc-photo-preview" style="width:48px;height:48px;border-radius:8px;background:var(--bg3);border:2px solid var(--accent1);display:flex;align-items:center;justify-content:center;font-size:1.2rem;overflow:hidden">👤</div>
+        <div>
+          <div style="font-size:.9rem;font-weight:600;color:var(--text)" id="hc-paciente-nombre">María Rodríguez Gómez</div>
+          <div style="font-size:.72rem;color:var(--text3)">CC 1.023.456.789 · 42 años · Sura EPS · Contributivo</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <span class="pill pill-prog">Consulta activa</span>
+          <span style="font-size:.72rem;color:var(--text3);align-self:center" id="hc-fecha-hora"></span>
+        </div>
+      </div>
+
+      <div id="hc-anamnesis" class="tab-content show">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:10px;font-weight:700">MOTIVO DE CONSULTA</div>
+        <div class="form-grid">
+          <div class="field span-full" style="position:relative">
+            <label>Motivo de Consulta <span style="color:var(--accent3);font-size:.65rem">(🎙️ puede dictar)</span></label>
+            <textarea id="hc-motivo" placeholder="Describa el motivo de consulta, inicio, duración, características…"></textarea>
+          </div>
+        </div>
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin:14px 0 10px;font-weight:700">SÍNTOMAS VISUALES</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:6px" id="sintomas-grid"></div>
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin:14px 0 10px;font-weight:700">ANTECEDENTES</div>
+        <div class="form-grid g2">
+          <div class="field"><label>Antecedentes Oculares</label><textarea placeholder="Cirugías, trauma, patologías previas…" style="min-height:56px"></textarea></div>
+          <div class="field"><label>Antecedentes Sistémicos</label><textarea placeholder="DM, HTA, tiroides, autoinmunes…" style="min-height:56px"></textarea></div>
+          <div class="field"><label>Medicamentos Actuales</label><input type="text" placeholder="Nombre, dosis, frecuencia…"></div>
+          <div class="field"><label>Alergias Conocidas</label><input type="text" placeholder="Medicamentos, sustancias..."></div>
+          <div class="field"><label>Antecedentes Familiares Oculares</label><input type="text" placeholder="Glaucoma, DMRE, catarata, estrabismo…"></div>
+          <div class="field"><label>Uso de Lentes Correctivos</label>
+            <select><option>No</option><option>Gafas monofocales</option><option>Gafas bifocales</option><option>Gafas progresivas</option><option>Lentes de contacto blandas</option><option>Lentes de contacto rígidas</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div id="hc-examen" class="tab-content">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div>
+            <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px;font-weight:700">AGUDEZA VISUAL</div>
+            <table class="eye-tbl">
+              <tr><th>Ojo</th><th>AV SC lejos</th><th>AV CC lejos</th><th>AV SC cerca</th><th>AV CC cerca</th><th>Pin Hole</th></tr>
+              <tr><td class="eye-lbl">OD</td><td><input placeholder="20/"></td><td><input placeholder="20/"></td><td><input placeholder="J"></td><td><input placeholder="J"></td><td><input placeholder="20/"></td></tr>
+              <tr><td class="eye-lbl">OI</td><td><input placeholder="20/"></td><td><input placeholder="20/"></td><td><input placeholder="J"></td><td><input placeholder="J"></td><td><input placeholder="20/"></td></tr>
+              <tr><td class="eye-lbl">AO</td><td><input placeholder="20/"></td><td><input placeholder="20/"></td><td><input placeholder="J"></td><td><input placeholder="J"></td><td>–</td></tr>
+            </table>
+          </div>
+          <div>
+            <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px;font-weight:700">REFRACCIÓN</div>
+            <table class="eye-tbl">
+              <tr><th>Ojo</th><th>Esfera (D)</th><th>Cilindro (D)</th><th>Eje (°)</th><th>Adición</th><th>Prisma</th><th>AV Final</th></tr>
+              <tr><td class="eye-lbl">OD</td><td><input placeholder="+/-"></td><td><input placeholder="+/-"></td><td><input placeholder="0-180"></td><td><input placeholder="+"></td><td><input></td><td><input placeholder="20/"></td></tr>
+              <tr><td class="eye-lbl">OI</td><td><input placeholder="+/-"></td><td><input placeholder="+/-"></td><td><input placeholder="0-180"></td><td><input placeholder="+"></td><td><input></td><td><input placeholder="20/"></td></tr>
+            </table>
+          </div>
+          <div class="form-grid g3" style="gap:10px">
+            <div class="field"><label>Cover Test Lejos</label><input placeholder="Orto / Exo / Eso"></div>
+            <div class="field"><label>Cover Test Cerca</label><input placeholder="Orto / Exo / Eso"></div>
+            <div class="field"><label>Hirschberg</label><input placeholder="Centrado / Desviado"></div>
+            <div class="field"><label>PIO OD (mmHg)</label><input placeholder="10-21"></div>
+            <div class="field"><label>PIO OI (mmHg)</label><input placeholder="10-21"></div>
+            <div class="field"><label>Método PIO</label><select><option>No contacto</option><option>Goldmann</option><option>Icare</option></select></div>
+          </div>
+          <div>
+            <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px;font-weight:700">QUERATOMETRÍA</div>
+            <table class="eye-tbl">
+              <tr><th>Ojo</th><th>K1 (D/mm)</th><th>K2 (D/mm)</th><th>Eje K</th><th>Ast. Corneal</th></tr>
+              <tr><td class="eye-lbl">OD</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+              <tr><td class="eye-lbl">OI</td><td><input></td><td><input></td><td><input></td><td><input></td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="hc-oftalmo" class="tab-content">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px;font-weight:700">SEGMENTO ANTERIOR – BIOMICROSCOPÍA</div>
+        <table class="eye-tbl">
+          <tr><th>Estructura</th><th>OD</th><th>OI</th></tr>
+          <tr><td class="eye-lbl">Párpados</td><td><input placeholder="Normal"></td><td><input placeholder="Normal"></td></tr>
+          <tr><td class="eye-lbl">Conjuntiva</td><td><input placeholder="Blanca / sin inyección"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Córnea</td><td><input placeholder="Transparente"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Cámara Anterior</td><td><input placeholder="Profunda / limpia"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Iris</td><td><input placeholder="Normal / plano"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Pupila</td><td><input placeholder="Redonda / reactiva"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Cristalino</td><td><input placeholder="Transparente"></td><td><input></td></tr>
+        </table>
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin:14px 0 8px;font-weight:700">FONDO DE OJO</div>
+        <table class="eye-tbl">
+          <tr><th>Estructura</th><th>OD</th><th>OI</th></tr>
+          <tr><td class="eye-lbl">Papila / C/D</td><td><input placeholder="C/D  bordes  color"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Relación C/D</td><td><input placeholder="0.3"></td><td><input placeholder="0.3"></td></tr>
+          <tr><td class="eye-lbl">Mácula</td><td><input placeholder="Brillo foveal normal"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Vasos</td><td><input placeholder="Relación AV / calibre"></td><td><input></td></tr>
+          <tr><td class="eye-lbl">Retina periférica</td><td><input placeholder="Sin degeneraciones"></td><td><input></td></tr>
+        </table>
+      </div>
+
+      <div id="hc-ayudas" class="tab-content">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:12px;font-weight:700">AYUDAS DIAGNÓSTICAS ADJUNTAS</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+          <div id="ayuda-zone" class="photo-zone" style="width:100%;height:100px;aspect-ratio:auto" onclick="document.getElementById('ayudaInput').click()">
+            📊<div style="font-size:.65rem;margin-top:4px">Topografía</div>
+          </div>
+          <div class="photo-zone" style="width:100%;height:100px;aspect-ratio:auto" onclick="showToast('Adjuntar OCT','success')">
+            🔬<div style="font-size:.65rem;margin-top:4px">OCT</div>
+          </div>
+          <div class="photo-zone" style="width:100%;height:100px;aspect-ratio:auto" onclick="showToast('Adjuntar Campo Visual','success')">
+            👁️<div style="font-size:.65rem;margin-top:4px">Campo Visual</div>
+          </div>
+          <div class="photo-zone" style="width:100%;height:100px;aspect-ratio:auto" onclick="showToast('Adjuntar Retinografía','success')">
+            📷<div style="font-size:.65rem;margin-top:4px">Retinografía</div>
+          </div>
+          <div class="photo-zone" style="width:100%;height:100px;aspect-ratio:auto" onclick="showToast('Adjuntar Queratometría','success')">
+            🌀<div style="font-size:.65rem;margin-top:4px">Queratometría</div>
+          </div>
+          <div class="photo-zone" style="width:100%;height:100px;aspect-ratio:auto" onclick="showToast('Adjuntar examen adicional','success')">
+            ➕<div style="font-size:.65rem;margin-top:4px">Otro examen</div>
+          </div>
+        </div>
+        <input type="file" id="ayudaInput" accept="image/*,application/pdf" style="display:none" onchange="showToast('Ayuda diagnóstica adjuntada','success')">
+        <div class="field"><label>Observaciones de Ayudas Diagnósticas</label>
+          <textarea placeholder="Describa hallazgos de topografía, OCT, campo visual, retinografía…" style="min-height:80px"></textarea>
+        </div>
+        <div class="form-grid g2" style="margin-top:10px">
+          <div class="field"><label>Ordenados Por</label><input type="text" placeholder="Profesional que ordena"></div>
+          <div class="field"><label>Laboratorio / Centro</label><input type="text" placeholder="Institución donde se realizaron"></div>
+        </div>
+      </div>
+
+      <div id="hc-dx" class="tab-content">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:12px;font-weight:700">DIAGNÓSTICO CIE-10 – SELECCIÓN RÁPIDA</div>
+        <div id="cie10-pills" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px"></div>
+        <div class="form-grid" style="margin-top:4px">
+          <div class="field span-full"><label>Diagnóstico(s) definitivo(s) con código CIE-10</label>
+            <textarea id="dx-field" placeholder="Ej: H52.1 Miopía bilateral / H52.2 Astigmatismo OD…" style="min-height:70px"></textarea>
+          </div>
+          <div class="field"><label>Tipo de Diagnóstico</label>
+            <select><option>Definitivo</option><option>Impresión diagnóstica</option><option>Sospecha</option></select>
+          </div>
+          <div class="field"><label>Condición del Usuario</label>
+            <select><option>Enfermedad general</option><option>Accidente de trabajo</option><option>Accidente de tránsito</option><option>Otro accidente</option><option>Enfermedad profesional</option><option>Maternidad</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div id="hc-plan" class="tab-content">
+        <div class="form-grid g2">
+          <div class="field span2"><label>Plan de Manejo / Tratamiento</label>
+            <textarea placeholder="Descripción del plan terapéutico, medicamentos, procedimientos…" style="min-height:80px"></textarea>
+          </div>
+          <div class="field"><label>Medicamentos Formulados</label>
+            <textarea placeholder="Nombre, dosis, vía, frecuencia, duración…" style="min-height:70px"></textarea>
+          </div>
+          <div class="field"><label>Remisiones / Interconsultas</label>
+            <textarea placeholder="Especialidad o servicio al que remite, razón…" style="min-height:70px"></textarea>
+          </div>
+          <div class="field"><label>Próxima Cita</label><input type="date"></div>
+          <div class="field"><label>Control en</label>
+            <select><option>1 semana</option><option>15 días</option><option>1 mes</option><option>3 meses</option><option>6 meses</option><option>1 año</option></select>
+          </div>
+          <div class="field"><label>Pronóstico</label>
+            <select><option>Favorable</option><option>Reservado</option><option>Desfavorable</option></select>
+          </div>
+          <div class="field"><label>Educación al Paciente</label>
+            <textarea placeholder="Instrucciones de uso, señales de alarma, cuidados…" style="min-height:60px"></textarea>
+          </div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn primary" onclick="showToast('Historia clínica guardada y firmada','success')">✓ Firmar y Guardar HC</button>
+          <button class="btn success" onclick="goTo('rips',null)">🗂️ Generar RIPS</button>
+          <button class="btn dian" onclick="goTo('dian',null)">🏛️ Facturar DIAN</button>
+          <button class="btn wa" onclick="notifWA()">💬 Notificar WA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ RDA ═══════════════════════ -->
+  <div class="section" id="sec-rda">
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title">🔬 RDA – Registro Diario de Atención Optométrica</div>
+        <div style="display:flex;gap:8px">
+          <div class="voice-btn" onclick="toggleVoice('rda')" title="Dictar RDA">🎙️</div>
+          <button class="btn dian" onclick="goTo('dian',null)">🏛️ Facturar</button>
+          <button class="btn success" onclick="goTo('rips',null)">🗂️ Generar RIPS</button>
+          <button class="btn" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+      </div>
+      <div style="padding:10px 16px;border-bottom:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap">
+        <div class="field" style="flex:1;min-width:140px"><label>Fecha</label><input type="date" id="rda-fecha"></div>
+        <div class="field" style="flex:1;min-width:100px"><label>Hora</label><input type="time" id="rda-hora"></div>
+        <div class="field" style="flex:2;min-width:200px"><label>Tipo de Consulta</label>
+          <select><option>Primera vez</option><option>Control</option><option>Urgencia</option><option>Post-quirúrgico</option></select>
+        </div>
+        <div class="field" style="flex:2;min-width:200px"><label>Régimen SGSSS</label>
+          <select><option>EPS – Contributivo</option><option>EPS – Subsidiado</option><option>Particular</option><option>ARL</option><option>SOAT</option></select>
+        </div>
+        <div class="field" style="flex:1;min-width:140px"><label>N° RDA</label><input type="text" id="rda-num" readonly style="color:var(--accent3)"></div>
+      </div>
+      <div style="padding:14px 16px">
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:10px;font-weight:700">DATOS DEL PACIENTE</div>
+        <div class="form-grid g3">
+          <div class="field span2"><label>Paciente</label><input type="text" value="María Rodríguez Gómez"></div>
+          <div class="field"><label>CC</label><input type="text" value="1.023.456.789"></div>
+          <div class="field"><label>Edad</label><input type="text" value="42 años"></div>
+          <div class="field"><label>EPS</label><input type="text" value="Sura EPS"></div>
+          <div class="field"><label>Profesional</label><select><option>Opt. Andrea Salcedo</option><option>Dr. Héctor Monsalve</option></select></div>
+        </div>
+        <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin:14px 0 10px;font-weight:700">AGUDEZA VISUAL Y REFRACCIÓN</div>
+        <table class="eye-tbl" style="margin-bottom:12px">
+          <tr><th>Ojo</th><th>AV SC</th><th>AV CC</th><th>Esfera</th><th>Cilindro</th><th>Eje</th><th>Adición</th><th>AV Final</th></tr>
+          <tr><td class="eye-lbl">OD</td><td><input placeholder="20/"></td><td><input placeholder="20/"></td><td><input placeholder="+/-"></td><td><input placeholder="+/-"></td><td><input placeholder="°"></td><td><input placeholder="+"></td><td><input placeholder="20/"></td></tr>
+          <tr><td class="eye-lbl">OI</td><td><input placeholder="20/"></td><td><input placeholder="20/"></td><td><input placeholder="+/-"></td><td><input placeholder="+/-"></td><td><input placeholder="°"></td><td><input placeholder="+"></td><td><input placeholder="20/"></td></tr>
+        </table>
+        <div class="form-grid g3">
+          <div class="field"><label>PIO OD</label><input placeholder="mmHg"></div>
+          <div class="field"><label>PIO OI</label><input placeholder="mmHg"></div>
+          <div class="field"><label>Diagnóstico CIE-10</label><input type="text" placeholder="Código – Descripción"></div>
+          <div class="field span3"><label>Plan / Formulación</label><input type="text" placeholder="Descripción de la formulación óptica, medicamentos, remisiones…"></div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="btn primary" onclick="showToast('RDA guardado exitosamente','success')">💾 Guardar RDA</button>
+          <button class="btn success" onclick="generarRIPS()">🗂️ Generar RIPS JSON</button>
+          <button class="btn dian" onclick="goTo('dian',null)">🏛️ Facturar Electrónicamente</button>
+          <button class="btn wa" onclick="notifWA()">📲 Notificar Paciente WA</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ RIPS / FEV-RIPS ═══════════════════════ -->
+  <div class="section" id="sec-rips">
+    <div class="grid2">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🗂️ Generador RIPS – Resolución 2275 de 2023</div>
+          <button class="btn primary" onclick="generarRIPS()">⚙️ Generar JSON</button>
+        </div>
+        <div class="card-body">
+          <div class="form-grid g2" style="margin-bottom:14px">
+            <div class="field"><label>NIT Prestador</label><input type="text" placeholder="900.XXX.XXX-X" value="900.123.456-7"></div>
+            <div class="field"><label>Código Habilitación</label><input type="text" placeholder="XXXXXXXXXX" value="0500201234"></div>
+            <div class="field"><label>Período Facturación</label><input type="month" value="2025-04"></div>
+            <div class="field"><label>Modalidad</label>
+              <select><option>FFS – Pago por Evento</option><option>Capitación</option><option>Global prospectivo</option></select>
+            </div>
+            <div class="field"><label>EPS Reportada</label><select><option>Sura EPS</option><option>Nueva EPS</option><option>Compensar</option><option>Sanitas</option></select></div>
+            <div class="field"><label>Tipo Reporte</label><select><option>CT – Consulta</option><option>AC – Procedimiento</option><option>US – Urgencias</option><option>AF – Farmacéutico</option></select></div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn success" onclick="generarRIPS()">📄 Generar RIPS JSON</button>
+            <button class="btn" onclick="showToast('RIPS enviado a MINSALUD','success')">📡 Enviar MINSALUD</button>
+            <button class="btn" onclick="showToast('RIPS descargado','success')">⬇️ Descargar ZIP</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">📋 FEV-RIPS JSON Preview</div>
+          <button class="btn" onclick="copyRIPS()" style="font-size:.72rem;padding:4px 10px">📋 Copiar</button>
+        </div>
+        <div class="card-body" style="padding:0">
+          <div class="code-block" id="rips-json-preview" style="margin:0;border-radius:0;border:none;max-height:420px">
+            <span style="color:var(--text3)">// Haga clic en "Generar RIPS JSON" para ver el resultado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><div class="card-title">📊 Historial de RIPS Generados</div></div>
+      <table class="tbl">
+        <thead><tr><th>Período</th><th>EPS</th><th>N° Registros</th><th>Valor Total</th><th>Estado</th><th>Fecha Envío</th><th>Acciones</th></tr></thead>
+        <tbody>
+          <tr><td>Mar 2025</td><td>Sura EPS</td><td>47</td><td>$8.240.000</td><td><span class="pill pill-done">Aceptado</span></td><td>01 Abr 2025</td><td><button class="btn" style="padding:3px 8px;font-size:.7rem">Ver</button></td></tr>
+          <tr><td>Feb 2025</td><td>Compensar</td><td>31</td><td>$5.180.000</td><td><span class="pill pill-done">Aceptado</span></td><td>01 Mar 2025</td><td><button class="btn" style="padding:3px 8px;font-size:.7rem">Ver</button></td></tr>
+          <tr><td>Feb 2025</td><td>Nueva EPS</td><td>19</td><td>$3.120.000</td><td><span class="pill pill-pend">Pendiente</span></td><td>–</td><td><button class="btn success" style="padding:3px 8px;font-size:.7rem">Enviar</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ DIAN ═══════════════════════ -->
+  <div class="section" id="sec-dian">
+    <div class="grid-main">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">🏛️ Facturación Electrónica – DIAN (Resolución 000042)</div>
+          <div style="display:flex;gap:8px">
+            <button class="btn" onclick="validarDIAN()">🔍 Validar</button>
+            <button class="btn primary" onclick="emitirDIAN()">📤 Emitir Factura</button>
+          </div>
+        </div>
+        <div class="tab-row">
+          <div class="tab active" onclick="switchTab(this,'dian-factura')">Nueva Factura</div>
+          <div class="tab" onclick="switchTab(this,'dian-hist')">Historial</div>
+          <div class="tab" onclick="switchTab(this,'dian-config')">Configuración</div>
+        </div>
+
+        <div id="dian-factura" class="tab-content show">
+          <div class="form-grid g3" style="margin-bottom:14px">
+            <div class="field"><label>N° Factura</label><input type="text" value="FE-2025-0087" readonly style="color:var(--accent3)"></div>
+            <div class="field"><label>Fecha Emisión</label><input type="date" id="dian-fecha"></div>
+            <div class="field"><label>Tipo Documento</label><select><option>Factura de Venta FV</option><option>Nota Crédito NC</option><option>Nota Débito ND</option></select></div>
+            <div class="field span3"><label>Adquiriente – Paciente / EPS</label><input type="text" value="Sura EPS – NIT 890.903.790-9"></div>
+            <div class="field"><label>Correo Adquiriente</label><input type="email" placeholder="facturacion@eps.com"></div>
+            <div class="field"><label>Forma de Pago</label><select><option>Contado</option><option>Crédito</option></select></div>
+            <div class="field"><label>Medio de Pago</label><select><option>Transferencia</option><option>Cheque</option><option>Efectivo</option></select></div>
+          </div>
+          <div style="font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent3);margin-bottom:8px;font-weight:700">ÍTEMS / SERVICIOS</div>
+          <table class="tbl" id="dian-items-tbl">
+            <thead><tr><th>CUPS/Código</th><th>Descripción Servicio</th><th>Cant.</th><th>V. Unitario</th><th>IVA</th><th>Total</th><th></th></tr></thead>
+            <tbody id="dian-items-body">
+              <tr><td>894101</td><td>Consulta optometría primera vez</td><td>1</td><td>$85.000</td><td>0%</td><td>$85.000</td><td><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem">✕</button></td></tr>
+              <tr><td>894103</td><td>Examen de agudeza visual</td><td>1</td><td>$45.000</td><td>0%</td><td>$45.000</td><td><button onclick="this.closest('tr').remove()" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem">✕</button></td></tr>
+            </tbody>
+          </table>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button class="btn" onclick="addDianItem()" style="font-size:.75rem">+ Agregar Ítem</button>
+            <div style="margin-left:auto;text-align:right">
+              <div style="font-size:.75rem;color:var(--text3)">Subtotal: <span style="color:var(--text)">$130.000</span></div>
+              <div style="font-size:.75rem;color:var(--text3)">IVA (0%): <span style="color:var(--text)">$0</span></div>
+              <div style="font-size:.9rem;font-weight:700;color:var(--accent3)">TOTAL: $130.000</div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.2);border-radius:8px">
+            <div style="font-size:.68rem;color:var(--amber);font-weight:700;margin-bottom:6px;letter-spacing:.08em;text-transform:uppercase">⚠️ CUFE – Código Único de Facturación Electrónica</div>
+            <div class="cufe-box" id="cufe-box">Pendiente de emisión – Haga clic en "Emitir Factura" para generar el CUFE</div>
+          </div>
+        </div>
+
+        <div id="dian-hist" class="tab-content">
+          <table class="tbl">
+            <thead><tr><th>N° Factura</th><th>Fecha</th><th>Adquiriente</th><th>Total</th><th>Estado DIAN</th><th>CUFE</th><th>Acciones</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--accent3)">FE-2025-0086</td><td>04 Abr</td><td>Compensar EPS</td><td>$210.000</td><td><span class="pill pill-done">✓ Aceptada</span></td><td><span style="font-size:.65rem;color:var(--text3)">b3f9...a2c1</span></td><td><button class="btn" style="padding:3px 8px;font-size:.7rem" onclick="showToast('Descargando XML','success')">XML</button></td></tr>
+              <tr><td style="color:var(--accent3)">FE-2025-0085</td><td>03 Abr</td><td>Nueva EPS</td><td>$175.000</td><td><span class="pill pill-done">✓ Aceptada</span></td><td><span style="font-size:.65rem;color:var(--text3)">7d1e...f4b8</span></td><td><button class="btn" style="padding:3px 8px;font-size:.7rem" onclick="showToast('Descargando XML','success')">XML</button></td></tr>
+              <tr><td style="color:var(--accent3)">FE-2025-0084</td><td>02 Abr</td><td>Particular</td><td>$130.000</td><td><span class="pill pill-pend">⏳ Procesando</span></td><td><span style="font-size:.65rem;color:var(--text3)">Pendiente</span></td><td><button class="btn" style="padding:3px 8px;font-size:.7rem" onclick="showToast('Reintentando','success')">Reintentar</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="dian-config" class="tab-content">
+          <div class="form-grid g2">
+            <div class="field"><label>NIT Empresa</label><input type="text" value="900.123.456-7"></div>
+            <div class="field"><label>Razón Social</label><input type="text" value="Gersam Axis IPS S.A.S."></div>
+            <div class="field"><label>Prefijo Factura</label><input type="text" value="FE"></div>
+            <div class="field"><label>Resolución DIAN N°</label><input type="text" placeholder="N° resolución habilitación"></div>
+            <div class="field"><label>Fecha Res. Inicio</label><input type="date"></div>
+            <div class="field"><label>Fecha Res. Fin</label><input type="date"></div>
+            <div class="field span2"><label>URL Proveedor Tecnológico</label><input type="text" placeholder="https://api.proveedor-dian.com"></div>
+            <div class="field"><label>Token API DIAN</label><input type="password" placeholder="••••••••••••••••"></div>
+            <div class="field"><label>Ambiente</label><select><option>Habilitación</option><option>Producción</option></select></div>
+          </div>
+          <button class="btn success" style="margin-top:10px" onclick="showToast('Configuración DIAN guardada','success')">💾 Guardar Configuración</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">📋 Proceso Emisión DIAN</div></div>
+        <div class="card-body">
+          <div class="dian-step done"><div class="dian-num">✓</div><div><div style="font-size:.82rem;font-weight:600;color:var(--text)">Datos del paciente / adquiriente</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Verificado en RUES y RUAF</div></div></div>
+          <div class="dian-step done"><div class="dian-num">✓</div><div><div style="font-size:.82rem;font-weight:600;color:var(--text)">Ítems y valores facturados</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Servicios CUPS codificados</div></div></div>
+          <div class="dian-step done"><div class="dian-num">✓</div><div><div style="font-size:.82rem;font-weight:600;color:var(--text)">Firma digital certificado</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Certificado vigente hasta Dic 2026</div></div></div>
+          <div class="dian-step pending"><div class="dian-num">4</div><div><div style="font-size:.82rem;font-weight:600;color:var(--text)">Envío XML a DIAN</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Pendiente – clic en Emitir</div></div></div>
+          <div class="dian-step" style="opacity:.4"><div class="dian-num">5</div><div><div style="font-size:.82rem;font-weight:600;color:var(--text)">Generación CUFE</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">Se genera al aceptar DIAN</div></div></div>
+          <div class="dian-step" style="opacity:.4;border-bottom:none"><div class="dian-num">6</div><div><div style="font-size:.82rem;font-weight:600;color:var(--text)">Envío representación gráfica</div><div style="font-size:.72rem;color:var(--text3);margin-top:2px">PDF al correo del adquiriente</div></div></div>
+          <div class="glow-line"></div>
+          <button class="btn dian" style="width:100%;justify-content:center;margin-top:8px" onclick="emitirDIAN()">📤 Emitir Factura Electrónica</button>
+          <button class="btn" style="width:100%;justify-content:center;margin-top:6px" onclick="showToast('Descargando representación gráfica PDF','success')">📄 Ver Representación Gráfica</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ INVENTARIO ═══════════════════════ -->
+  <div class="section" id="sec-inventario">
+    <div class="metrics-row" style="grid-template-columns:repeat(4,1fr)">
+      <div class="metric"><div class="metric-label">Total Productos</div><div class="metric-val">248</div><div class="metric-sub">SKUs activos</div></div>
+      <div class="metric"><div class="metric-label">Stock Crítico</div><div class="metric-val red">5</div><div class="metric-sub">Bajo mínimo</div></div>
+      <div class="metric"><div class="metric-label">Valor Inventario</div><div class="metric-val teal">$14.2M</div><div class="metric-sub">Costo total</div></div>
+      <div class="metric"><div class="metric-label">Órdenes Compra</div><div class="metric-val amber">2</div><div class="metric-sub">Pendientes</div></div>
+    </div>
+    <div class="grid-main">
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">📦 Gestión de Inventario</div>
+          <div style="display:flex;gap:6px">
+            <input class="tb-search" type="text" placeholder="Buscar producto…" style="width:160px;padding:5px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Exo 2',sans-serif;font-size:.78rem;outline:none">
+            <button class="btn primary" onclick="showModalInventario()">+ Nuevo</button>
+          </div>
+        </div>
+        <table class="tbl" id="inv-tbl">
+          <thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th>Stock</th><th>Mínimo</th><th>V. Unitario</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="inv-tbody"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">⚠️ Alertas de Inventario</div></div>
+        <div class="card-body" style="display:flex;flex-direction:column;gap:8px" id="inv-alertas"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ NOTIFICACIONES WA ═══════════════════════ -->
+  <div class="section" id="sec-notificaciones">
+    <div class="grid-main">
+      <div class="card">
+        <div class="card-head"><div class="card-title">💬 Panel de Notificaciones WhatsApp Business</div></div>
+        <table class="tbl">
+          <thead><tr><th>Paciente</th><th>Teléfono</th><th>Tipo Notif.</th><th>Estado</th><th>Acción</th></tr></thead>
+          <tbody id="wa-tbody"></tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">📝 Compositor de Mensaje</div></div>
+        <div class="card-body">
+          <div class="field" style="margin-bottom:10px"><label>Plantilla</label>
+            <select id="wa-template" onchange="updateWAPreview()">
+              <option value="receta">Receta óptica lista</option>
+              <option value="cita">Recordatorio de cita</option>
+              <option value="resultado">Resultados disponibles</option>
+              <option value="control">Control programado</option>
+              <option value="lentes">Lentes listos</option>
+              <option value="personalizado">Mensaje personalizado</option>
+            </select>
+          </div>
+          <div class="field" style="margin-bottom:10px"><label>Paciente Destino</label>
+            <input type="text" id="wa-dest-nombre" placeholder="Nombre del paciente">
+          </div>
+          <div class="wa-bubble" id="wa-preview-msg">Seleccione una plantilla para previsualizar el mensaje.</div>
+          <div class="field" style="margin-bottom:10px"><label>Número WhatsApp</label>
+            <input type="tel" id="wa-dest-phone" placeholder="+57 300 000 0000">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn wa" style="flex:1;justify-content:center" onclick="sendWA()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#25d366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+              Enviar WhatsApp
+            </button>
+            <button class="btn" onclick="copyWAMsg()" style="padding:8px 12px">📋 Copiar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ REPORTES ═══════════════════════ -->
+  <div class="section" id="sec-reportes">
+    <div class="card">
+      <div class="card-head"><div class="card-title">📈 Reportes y Estadísticas</div><button class="btn primary" onclick="showToast('Exportando reporte Excel','success')">📊 Exportar Excel</button></div>
+      <div class="card-body">
+        <div class="metrics-row" style="margin-bottom:16px">
+          <div class="metric"><div class="metric-label">Consultas Mes</div><div class="metric-val">347</div><div class="metric-sub">↑ 12% vs mes ant.</div></div>
+          <div class="metric"><div class="metric-label">Facturado Mes</div><div class="metric-val teal">$28.4M</div><div class="metric-sub">DIAN verificado</div></div>
+          <div class="metric"><div class="metric-label">RIPS Enviados</div><div class="metric-val green">312</div><div class="metric-sub">90% del total</div></div>
+          <div class="metric"><div class="metric-label">Pacientes Nuevos</div><div class="metric-val amber">89</div><div class="metric-sub">Este mes</div></div>
+          <div class="metric"><div class="metric-label">NPS Pacientes</div><div class="metric-val green">94%</div><div class="metric-sub">Satisfacción</div></div>
+        </div>
+        <div style="text-align:center;padding:30px;color:var(--text3);font-size:.82rem;border:1px dashed var(--border);border-radius:8px">
+          📊 Área de gráficas estadísticas – Se renderizarían con Chart.js: consultas por día, diagnósticos más frecuentes CIE-10, facturación por EPS, distribución de RIPS.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════ CONFIG ═══════════════════════ -->
+  <div class="section" id="sec-config">
+    <div class="card">
+      <div class="card-head"><div class="card-title">⚙️ Configuración del Sistema</div></div>
+      <div class="card-body">
+        <div class="form-grid g2">
+          <div class="field"><label>Nombre IPS</label><input type="text" value="Gersam Axis IPS S.A.S."></div>
+          <div class="field"><label>NIT</label><input type="text" value="900.123.456-7"></div>
+          <div class="field"><label>Código Habilitación REPS</label><input type="text" value="0500201234"></div>
+          <div class="field"><label>Correo Administrativo</label><input type="email" placeholder="admin@gersamaxis.com"></div>
+          <div class="field"><label>Google Calendar API Key</label><input type="text" placeholder="AIza…"></div>
+          <div class="field"><label>WhatsApp Business Phone ID</label><input type="text" placeholder="1234567890"></div>
+          <div class="field"><label>WA Access Token</label><input type="password" placeholder="••••••••••••••••"></div>
+          <div class="field"><label>Modo Voz</label><select><option>Web Speech API (Chrome)</option><option>Google Speech-to-Text</option><option>Azure Cognitive</option></select></div>
+        </div>
+        <button class="btn primary" style="margin-top:14px" onclick="showToast('Configuración guardada exitosamente','success')">💾 Guardar Configuración</button>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /main -->
+</div><!-- /main-wrap -->
+
+<!-- MODAL VOZ -->
+<div class="modal-overlay" id="modal-voz">
+  <div class="modal" style="text-align:center;max-width:400px">
+    <div style="font-size:3rem;margin-bottom:12px">🎙️</div>
+    <div class="modal-title">Reconocimiento de Voz Activo</div>
+    <div class="modal-sub">Hable claramente. El texto se dictará en el campo activo.</div>
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(239,68,68,.15);border:3px solid var(--red);display:flex;align-items:center;justify-content:center;margin:16px auto;animation:voicePulse 1s infinite">
+      <div style="font-size:2rem">🔴</div>
+    </div>
+    <div id="voice-transcript" style="min-height:48px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:.82rem;color:var(--accent3);margin:12px 0;text-align:left">Escuchando…</div>
+    <div class="modal-actions" style="justify-content:center">
+      <button class="btn danger" onclick="stopVoice()">⏹ Detener</button>
+      <button class="btn" onclick="closeModalVoz()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL INVENTARIO -->
+<div class="modal-overlay" id="modal-inventario">
+  <div class="modal">
+    <div class="modal-title">+ Nuevo Producto / Servicio</div>
+    <div class="modal-sub">Registro en inventario de la IPS</div>
+    <div class="form-grid g2">
+      <div class="field"><label>Código Interno</label><input type="text" placeholder="INV-XXXX"></div>
+      <div class="field"><label>Código CUPS / INVIMA</label><input type="text" placeholder=""></div>
+      <div class="field span2"><label>Nombre del Producto / Servicio</label><input type="text" placeholder=""></div>
+      <div class="field"><label>Categoría</label>
+        <select><option>Lentes ópticos</option><option>Medicamentos</option><option>Insumos clínicos</option><option>Equipos</option><option>Servicios</option></select>
+      </div>
+      <div class="field"><label>Unidad de Medida</label><input type="text" placeholder="Und / Caja / Frasco"></div>
+      <div class="field"><label>Stock Actual</label><input type="number" placeholder="0"></div>
+      <div class="field"><label>Stock Mínimo</label><input type="number" placeholder="0"></div>
+      <div class="field"><label>Valor Compra</label><input type="number" placeholder="$0"></div>
+      <div class="field"><label>Valor Venta</label><input type="number" placeholder="$0"></div>
+      <div class="field span2"><label>Observaciones</label><input type="text" placeholder=""></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModalInv()">Cancelar</button>
+      <button class="btn primary" onclick="guardarInv()">💾 Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

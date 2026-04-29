@@ -1,0 +1,51 @@
+@media print {
+  /* Ocultar elementos de navegación y acciones */
+  .sidebar, .topbar, .tab-row, .btn, .voice-btn, .sidebar-toggle, .tb-search {
+    display: none !important;
+  }
+
+  /* Resetear el layout principal para que ocupe todo el ancho/alto */
+  .main-wrap {
+    left: 0 !important;
+    top: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+  html, body {
+    height: auto !important;
+    overflow: visible !important;
+    background: white !important;
+  }
+
+  /* Asegurar que todas las pestañas de la HC sean visibles al imprimir */
+  .tab-content {
+    display: block !important;
+    page-break-inside: avoid;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  /* Quitar sombras y fondos innecesarios para ahorrar tinta */
+  .card, .section, .main, .grid-bg {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  /* Ajustar inputs para lectura */
+  input, select, textarea {
+    border: 1px solid #ccc !important;
+    background: white !important;
+    color: black !important;
+    resize: none !important;
+  }
+  
+  /* Hacer que la tabla se ajuste al ancho */
+  .eye-tbl {
+    width: 100% !important;
+    page-break-inside: avoid;
+  }
+}
