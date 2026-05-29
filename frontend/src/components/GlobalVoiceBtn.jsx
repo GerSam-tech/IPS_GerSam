@@ -14,10 +14,19 @@ const GlobalVoiceBtn = () => {
     return () => document.removeEventListener('focusin', handleFocusIn);
   }, []);
 
+  const recognitionRef = useRef(null);
+
   const toggleVoice = (e) => {
     e.preventDefault();
+    
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
+
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert("Tu navegador no soporta dictado por voz.");
+      alert("Tu navegador no soporta dictado por voz. Asegúrate de usar un navegador compatible (como Chrome) y estar en un sitio seguro (HTTPS o localhost).");
       return;
     }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -64,9 +73,28 @@ const GlobalVoiceBtn = () => {
         alert("Selecciona un campo de texto primero para dictar.");
       }
     };
+    
+    recognition.onerror = (evt) => {
+      console.error("Speech recognition error", evt.error);
+      setIsListening(false);
+      if (evt.error === 'not-allowed') {
+        alert("Permiso de micrófono denegado. Por favor, habilita el acceso al micrófono en tu navegador.");
+      } else if (evt.error === 'no-speech') {
+        alert("El navegador no detectó ningún sonido. Por favor revisa que el micrófono correcto esté seleccionado (ícono de cámara/micrófono en la barra de direcciones) y que no esté silenciado.");
+      } else {
+        alert(`Error de dictado por voz: ${evt.error}`);
+      }
+    };
+    
     recognition.onend = () => setIsListening(false);
     
-    recognition.start();
+    try {
+      recognition.start();
+      recognitionRef.current = recognition;
+    } catch (err) {
+      console.error(err);
+      setIsListening(false);
+    }
   };
 
   return (

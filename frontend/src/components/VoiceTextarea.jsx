@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
 const VoiceTextarea = ({ name, value, onChange, placeholder, style, disabled }) => {
   const [isListening, setIsListening] = useState(false);
@@ -14,10 +14,17 @@ const VoiceTextarea = ({ name, value, onChange, placeholder, style, disabled }) 
     }
   };
 
+  const recognitionRef = useRef(null);
+
   const toggleVoice = (e) => {
     e.preventDefault();
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert("Lo sentimos, tu navegador no soporta dictado por voz.");
+      alert("Lo sentimos, tu navegador no soporta dictado por voz. Asegúrate de usar un navegador compatible y estar en un entorno seguro.");
       return;
     }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -34,9 +41,26 @@ const VoiceTextarea = ({ name, value, onChange, placeholder, style, disabled }) 
       
       handleChange({ target: { name, value: newVal } });
     };
+    recognition.onerror = (evt) => {
+      console.error("Speech recognition error", evt.error);
+      setIsListening(false);
+      if (evt.error === 'not-allowed') {
+        alert("Permiso de micrófono denegado. Por favor, habilita el acceso al micrófono en tu navegador.");
+      } else if (evt.error === 'no-speech') {
+        alert("El navegador no detectó ningún sonido. Por favor revisa que el micrófono correcto esté seleccionado (ícono de cámara/micrófono en la barra de direcciones) y que no esté silenciado.");
+      } else {
+        alert(`Error de dictado por voz: ${evt.error}`);
+      }
+    };
     recognition.onend = () => setIsListening(false);
     
-    recognition.start();
+    try {
+      recognition.start();
+      recognitionRef.current = recognition;
+    } catch (err) {
+      console.error(err);
+      setIsListening(false);
+    }
   };
 
   return (

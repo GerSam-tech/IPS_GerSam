@@ -21,9 +21,16 @@ const Topbar = ({ title, goTo, isCollapsed }) => {
     ? patients.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()) || (p.doc && p.doc.includes(searchTerm))) 
     : [];
 
+  const recognitionRef = useRef(null);
+
   const toggleVoice = () => {
+    if (isListening && recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsListening(false);
+      return;
+    }
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert("Lo sentimos, tu navegador no soporta dictado por voz. Usa Chrome o Edge.");
+      alert("Lo sentimos, tu navegador no soporta dictado por voz. Usa Chrome o Edge en un sitio seguro (HTTPS o localhost).");
       return;
     }
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -38,9 +45,26 @@ const Topbar = ({ title, goTo, isCollapsed }) => {
       setSearchTerm(transcript);
       setShowResults(true);
     };
+    recognition.onerror = (evt) => {
+      console.error("Speech recognition error", evt.error);
+      setIsListening(false);
+      if (evt.error === 'not-allowed') {
+        alert("Permiso de micrófono denegado. Por favor, habilítalo en tu navegador.");
+      } else if (evt.error === 'no-speech') {
+        alert("El navegador no detectó ningún sonido. Por favor revisa que el micrófono correcto esté seleccionado (ícono de cámara/micrófono en la barra de direcciones) y que no esté silenciado.");
+      } else {
+        alert(`Error de dictado por voz: ${evt.error}`);
+      }
+    };
     recognition.onend = () => setIsListening(false);
     
-    recognition.start();
+    try {
+      recognition.start();
+      recognitionRef.current = recognition;
+    } catch (err) {
+      console.error(err);
+      setIsListening(false);
+    }
   };
 
   const handleSelectPatient = (p) => {
