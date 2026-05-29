@@ -5,13 +5,22 @@ const GlobalVoiceBtn = () => {
   const lastFocusedInput = useRef(null);
 
   useEffect(() => {
-    const handleFocusIn = (e) => {
+    const handleFocus = (e) => {
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         lastFocusedInput.current = e.target;
       }
     };
-    document.addEventListener('focusin', handleFocusIn);
-    return () => document.removeEventListener('focusin', handleFocusIn);
+    const handleClick = (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+        lastFocusedInput.current = e.target;
+      }
+    };
+    document.addEventListener('focus', handleFocus, true);
+    document.addEventListener('click', handleClick, true);
+    return () => {
+      document.removeEventListener('focus', handleFocus, true);
+      document.removeEventListener('click', handleClick, true);
+    };
   }, []);
 
   const recognitionRef = useRef(null);
@@ -61,8 +70,31 @@ const GlobalVoiceBtn = () => {
           nativeInputValueSetter.call(input, newVal);
         }
         
-        const event = new Event('input', { bubbles: true });
-        input.dispatchEvent(event);
+        // Encontrar y llamar directamente al onChange de React para asegurar la actualización del estado
+        const reactKey = Object.keys(input).find(key => 
+          key.startsWith('__reactProps$') || 
+          key.startsWith('__reactEventHandlers$') || 
+          key.startsWith('__reactFiber$')
+        );
+        if (reactKey && input[reactKey]) {
+          const props = input[reactKey];
+          if (props.onChange) {
+            try {
+              props.onChange({ 
+                target: input,
+                currentTarget: input,
+                preventDefault: () => {},
+                stopPropagation: () => {}
+              });
+            } catch (e) {
+              console.error("Error calling React onChange directly:", e);
+            }
+          }
+        }
+
+        // Despachar eventos estándar del DOM
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
         
         // Recuperar el foco
         input.focus();
@@ -104,7 +136,8 @@ const GlobalVoiceBtn = () => {
   return (
     <button 
       className="btn"
-      onMouseDown={(e) => e.preventDefault()} // Evita quitar el foco del input activo
+      onMouseDown={(e) => e.preventDefault()} // Evita quitar el foco del input activo en desktop
+      onTouchStart={(e) => e.preventDefault()} // Evita quitar el foco del input activo en móviles
       onClick={toggleVoice}
       title="Dictado Global por Voz (Clickea cualquier campo, luego aquí)"
       style={{ 

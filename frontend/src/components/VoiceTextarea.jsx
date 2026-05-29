@@ -3,6 +3,7 @@ import { useState, useRef } from 'react';
 const VoiceTextarea = ({ name, value, onChange, placeholder, style, disabled }) => {
   const [isListening, setIsListening] = useState(false);
   const [internalValue, setInternalValue] = useState(value || '');
+  const textareaRef = useRef(null);
 
   const actualValue = value !== undefined ? value : internalValue;
 
@@ -35,11 +36,63 @@ const VoiceTextarea = ({ name, value, onChange, placeholder, style, disabled }) 
     recognition.onstart = () => setIsListening(true);
     recognition.onresult = (evt) => {
       let transcript = evt.results[0][0].transcript.replace(/\.$/, '').trim();
-      // Si el primer carácter es minúscula y se añade a texto existente, ponemos espacio, sino normal
-      const separator = actualValue && !actualValue.endsWith(' ') && !actualValue.endsWith('\n') ? ' ' : '';
-      const newVal = actualValue ? `${actualValue}${separator}${transcript}` : transcript;
       
-      handleChange({ target: { name, value: newVal } });
+      const textarea = textareaRef.current;
+      if (textarea) {
+        const start = textarea.selectionStart || 0;
+        const end = textarea.selectionEnd || 0;
+        const currentVal = textarea.value;
+        const before = currentVal.substring(0, start);
+        const after = currentVal.substring(end, currentVal.length);
+        
+        const space = before && !before.endsWith(' ') && !before.endsWith('\n') ? ' ' : '';
+        const insertText = space + transcript;
+        const newVal = before + insertText + after;
+        
+        // 1. Forzar la actualización nativa del DOM
+        const nativeTextareaValueSetter = Object.getOwnPropertyDescriptor(window.HTMLTextAreaElement.prototype, "value").set;
+        nativeTextareaValueSetter.call(textarea, newVal);
+        
+        // Encontrar y llamar directamente al onChange de React
+        const reactKey = Object.keys(textarea).find(key => 
+          key.startsWith('__reactProps$') || 
+          key.startsWith('__reactEventHandlers$') || 
+          key.startsWith('__reactFiber$')
+        );
+        if (reactKey && textarea[reactKey]) {
+          const props = textarea[reactKey];
+          if (props.onChange) {
+            try {
+              props.onChange({ 
+                target: textarea,
+                currentTarget: textarea,
+                preventDefault: () => {},
+                stopPropagation: () => {}
+              });
+            } catch (e) {
+              console.error("Error calling React onChange on textarea directly:", e);
+            }
+          }
+        }
+
+        // 2. Despachar eventos estándar del DOM
+        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+        
+        // 3. Actualizar estado local/React
+        handleChange({ target: { name, value: newVal } });
+        
+        // 4. Devolver foco y posición del cursor
+        textarea.focus();
+        setTimeout(() => {
+          textarea.setSelectionRange(start + insertText.length, start + insertText.length);
+        }, 0);
+      } else {
+        // Fallback si no está la ref
+        const separator = actualValue && !actualValue.endsWith(' ') && !actualValue.endsWith('\n') ? ' ' : '';
+        const newVal = actualValue ? `${actualValue}${separator}${transcript}` : transcript;
+        handleChange({ target: { name, value: newVal } });
+      }
     };
     recognition.onerror = (evt) => {
       console.error("Speech recognition error", evt.error);
@@ -70,6 +123,7 @@ const VoiceTextarea = ({ name, value, onChange, placeholder, style, disabled }) 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <textarea 
+        ref={textareaRef}
         name={name} 
         value={actualValue} 
         onChange={handleChange} 
@@ -78,6 +132,8 @@ const VoiceTextarea = ({ name, value, onChange, placeholder, style, disabled }) 
         disabled={disabled}
       />
       <button 
+        onMouseDown={(e) => e.preventDefault()} // Evita quitar el foco en desktop
+        onTouchStart={(e) => e.preventDefault()} // Evita quitar el foco en móviles
         onClick={toggleVoice} 
         disabled={disabled}
         title="Dictado por voz"
