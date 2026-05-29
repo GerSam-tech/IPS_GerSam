@@ -81,6 +81,10 @@ const GlobalVoiceBtn = () => {
         alert("Permiso de micrófono denegado. Por favor, habilita el acceso al micrófono en tu navegador.");
       } else if (evt.error === 'no-speech') {
         alert("El navegador no detectó ningún sonido. Por favor revisa que el micrófono correcto esté seleccionado (ícono de cámara/micrófono en la barra de direcciones) y que no esté silenciado.");
+      } else if (evt.error === 'network') {
+        alert("Error de red: No se pudo conectar con el servicio de reconocimiento de voz de Google. Verifica tu conexión a Internet o intenta nuevamente.");
+      } else if (evt.error === 'service-not-allowed') {
+        alert("Error de servicio: El reconocimiento de voz no está permitido en este sitio o navegador por razones de seguridad o configuración.");
       } else {
         alert(`Error de dictado por voz: ${evt.error}`);
       }
