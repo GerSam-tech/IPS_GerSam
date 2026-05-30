@@ -61,7 +61,7 @@ const Registro = ({ goTo }) => {
         </div>
 
         {/* IDENTIFICACIÓN */}
-        <div style={{ display: 'flex', gap: '16px', padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
+        <div className="photo-reg-container" style={{ padding: '14px 16px', borderBottom: '1px solid var(--border)' }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
             <div className="photo-zone" onClick={handlePhotoClick}>
               {photoPreview ? (

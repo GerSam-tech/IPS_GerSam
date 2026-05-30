@@ -34,6 +34,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .sidebar.collapsed~.main-wrap .topbar{left:70px}
 .tb-title{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text)}
 .tb-spacer{flex:1}
+.topbar-actions{display:flex;align-items:center;gap:12px}
 .tb-search{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;width:300px;transition:border-color .2s}
 .tb-search:focus-within{border-color:var(--accent1);background:var(--bg2);box-shadow:0 0 0 3px var(--glow)}
 .tb-search input{background:none;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:.85rem;width:100%}
@@ -174,3 +175,174 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .eye-lbl{background:var(--bg3)!important;color:var(--text2)!important;font-weight:700;font-size:.8rem!important}
 .wa-bubble{background:#dcf8c6;border:1px solid #b2e6a3;border-radius:12px;padding:14px 16px;font-size:.9rem;color:#111b21;line-height:1.6;margin-bottom:16px;min-height:80px;border-top-left-radius:0;white-space:pre-line;box-shadow:var(--shadow-sm)}
 .cufe-box{background:var(--bg3);border:1px dashed var(--amber);border-radius:8px;padding:12px 16px;font-family:'Courier New',monospace;font-size:.8rem;color:var(--text2);word-break:break-all}
+
+/* ==========================================
+   RESPONSIVE DESIGN (MOBILE & TABLET)
+   ========================================== */
+.menu-toggle-btn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  /* Sidebar responsive rules */
+  .sidebar {
+    left: -240px;
+    width: 240px !important;
+    transition: left 0.3s ease;
+  }
+  .sidebar.open,
+  .sidebar:not(.collapsed) {
+    left: 0;
+  }
+  .sidebar-toggle {
+    display: none !important;
+  }
+  
+  /* Sidebar overlay */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 99;
+  }
+  .sidebar.open ~ .sidebar-overlay,
+  .sidebar:not(.collapsed) ~ .sidebar-overlay {
+    display: block;
+  }
+
+  /* Topbar responsive layout (2 rows) */
+  .topbar {
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 70px;
+    padding: 8px 16px !important;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .tb-title {
+    font-size: 1.15rem;
+    order: 1;
+  }
+  .menu-toggle-btn {
+    display: block !important;
+    order: 0;
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--text);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+  .menu-toggle-btn:hover {
+    background: var(--bg3);
+  }
+  .tb-spacer {
+    display: none !important;
+  }
+  .topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    order: 2;
+  }
+  .tb-search {
+    width: 100% !important;
+    order: 3;
+    margin-top: 4px;
+  }
+  
+  /* Hide labels on mobile inside topbar actions */
+  .topbar-actions .tb-btn-text,
+  .topbar-actions .status-dian-text {
+    display: none !important;
+  }
+  .topbar-actions .tb-btn {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+  
+  /* Main area responsive rules */
+  .main-wrap {
+    left: 0 !important;
+    width: 100% !important;
+    top: 116px !important;
+  }
+  .main {
+    padding: 16px !important;
+    gap: 16px !important;
+  }
+
+  /* Grid stacking rules */
+  .grid2, .grid3, .grid-main {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .form-grid.g2, .form-grid.g3 {
+    grid-template-columns: 1fr !important;
+  }
+  .field.span2, .field.span3 {
+    grid-column: span 1 !important;
+  }
+  .photo-reg-container {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 16px !important;
+  }
+
+  /* Make tables and parameters scrollable */
+  .tbl, .eye-tbl {
+    display: block !important;
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tbl th, .tbl td, .eye-tbl th, .eye-tbl td {
+    white-space: nowrap !important;
+  }
+
+  /* Scrollable tabs & minor layout adjustments */
+  .tab-row {
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-content {
+    padding: 16px !important;
+  }
+  
+  /* Metrics layout card optimization */
+  .metrics-row {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .metric {
+    padding: 12px !important;
+  }
+  .metric-val {
+    font-size: 1.6rem !important;
+  }
+  .metric-label {
+    font-size: 0.7rem !important;
+  }
+
+  /* Modal responsiveness */
+  .modal {
+    padding: 16px !important;
+    max-width: 95vw !important;
+  }
+  .modal-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .modal-actions .btn {
+    flex: 1;
+    min-width: 120px;
+  }
+}

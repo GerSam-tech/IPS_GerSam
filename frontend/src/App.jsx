@@ -15,7 +15,7 @@ import Config from './pages/Config';
 
 function App() {
   const [activeSection, setActiveSection] = useState('dashboard');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(window.innerWidth <= 768);
 
   const renderSection = () => {
     switch (activeSection) {
@@ -56,11 +56,13 @@ function App() {
         activeSection={activeSection}
         setActiveSection={setActiveSection}
       />
+      <div className="sidebar-overlay" onClick={() => setIsSidebarCollapsed(true)}></div>
 
       <div className="main-wrap" style={{ left: isSidebarCollapsed ? '70px' : '240px' }}>
         <Topbar 
           title={getTitle()} 
           isCollapsed={isSidebarCollapsed}
+          toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           goTo={setActiveSection} 
         />
         

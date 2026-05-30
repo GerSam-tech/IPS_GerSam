@@ -2,7 +2,12 @@ const Sidebar = ({ isCollapsed, toggleSidebar, activeSection, setActiveSection }
   const NavItem = ({ id, icon, label, badge }) => (
     <div 
       className={`nav-item ${activeSection === id ? 'active' : ''}`} 
-      onClick={() => setActiveSection(id)}
+      onClick={() => {
+        setActiveSection(id);
+        if (window.innerWidth <= 768 && !isCollapsed) {
+          toggleSidebar();
+        }
+      }}
     >
       <span className="nav-icon">{icon}</span>
       <span className="nav-label">{label}</span>

@@ -12,8 +12,9 @@ let sbCollapsed = false;
 function toggleSidebar(){
   sbCollapsed = !sbCollapsed;
   document.getElementById('sidebar').classList.toggle('collapsed');
+  document.getElementById('sidebar').classList.toggle('open');
   const tog = document.querySelector('.sidebar-toggle');
-  tog.textContent = sbCollapsed ? '▶' : '◀';
+  if (tog) tog.textContent = sbCollapsed ? '▶' : '◀';
 }
 
 // ─── NAVIGATION ──────────────────────────────────────────────────────────────
@@ -32,6 +33,15 @@ function goTo(id, navEl){
   if(navEl){
     document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
     navEl.classList.add('active');
+  }
+  // On mobile, auto-close sidebar on page switch
+  if(window.innerWidth <= 768){
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.add('collapsed');
+    sidebar.classList.remove('open');
+    sbCollapsed = true;
+    const tog = document.querySelector('.sidebar-toggle');
+    if (tog) tog.textContent = '▶';
   }
 }
 
