@@ -35,7 +35,7 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
 .tb-title{font-family:'Poppins',sans-serif;font-size:1.3rem;font-weight:600;color:var(--text)}
 .tb-spacer{flex:1}
 .topbar-actions{display:flex;align-items:center;gap:12px}
-.tb-search{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;width:300px;transition:border-color .2s}
+.tb-search{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:8px 14px;width:100%;max-width:300px;transition:border-color .2s}
 .tb-search:focus-within{border-color:var(--accent1);background:var(--bg2);box-shadow:0 0 0 3px var(--glow)}
 .tb-search input{background:none;border:none;outline:none;color:var(--text);font-family:'Inter',sans-serif;font-size:.85rem;width:100%}
 .tb-search input::placeholder{color:var(--text3)}
@@ -260,11 +260,6 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
     margin-top: 4px;
   }
   
-  /* Hide labels on mobile inside topbar actions */
-  .topbar-actions .tb-btn-text,
-  .topbar-actions .status-dian-text {
-    display: none !important;
-  }
   .topbar-actions .tb-btn {
     padding: 6px 10px;
     font-size: 0.8rem;
@@ -344,5 +339,12 @@ html,body{height:100%;overflow:hidden;font-family:'Inter',sans-serif;background:
   .modal-actions .btn {
     flex: 1;
     min-width: 120px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .topbar-actions .tb-btn-text,
+  .topbar-actions .status-dian-text {
+    display: none !important;
   }
 }
